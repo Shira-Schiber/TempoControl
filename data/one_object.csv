@@ -1,0 +1,81 @@
+prompt,temp_object,control_signal1
+"An empty scene. Suddenly, a person appears out of nowhere, drawing all attention.",person,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bicycle appears out of nowhere, drawing all attention.",bicycle,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a car appears out of nowhere, drawing all attention.",car,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a motorcycle appears out of nowhere, drawing all attention.",motorcycle,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a airplane appears out of nowhere, drawing all attention.",airplane,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bus appears out of nowhere, drawing all attention.",bus,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a train appears out of nowhere, drawing all attention.",train,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a truck appears out of nowhere, drawing all attention.",truck,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a boat appears out of nowhere, drawing all attention.",boat,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a traffic light appears out of nowhere, drawing all attention.",traffic light,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a fire hydrant appears out of nowhere, drawing all attention.",fire hydrant,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a stop sign appears out of nowhere, drawing all attention.",stop sign,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a parking meter appears out of nowhere, drawing all attention.",parking meter,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bench appears out of nowhere, drawing all attention.",bench,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bird appears out of nowhere, drawing all attention.",bird,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a cat appears out of nowhere, drawing all attention.",cat,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a dog appears out of nowhere, drawing all attention.",dog,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a horse appears out of nowhere, drawing all attention.",horse,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a sheep appears out of nowhere, drawing all attention.",sheep,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a cow appears out of nowhere, drawing all attention.",cow,0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a elephant appears out of nowhere, drawing all attention.",elephant,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bear appears out of nowhere, drawing all attention.",bear,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a zebra appears out of nowhere, drawing all attention.",zebra,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a giraffe appears out of nowhere, drawing all attention.",giraffe,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a backpack appears out of nowhere, drawing all attention.",backpack,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a umbrella appears out of nowhere, drawing all attention.",umbrella,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a handbag appears out of nowhere, drawing all attention.",handbag,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a tie appears out of nowhere, drawing all attention.",tie,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a suitcase appears out of nowhere, drawing all attention.",suitcase,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a frisbee appears out of nowhere, drawing all attention.",frisbee,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a skis appears out of nowhere, drawing all attention.",skis,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a snowboard appears out of nowhere, drawing all attention.",snowboard,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a sports ball appears out of nowhere, drawing all attention.",sports ball,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a kite appears out of nowhere, drawing all attention.",kite,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a baseball bat appears out of nowhere, drawing all attention.",baseball bat,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a baseball glove appears out of nowhere, drawing all attention.",baseball glove,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a skateboard appears out of nowhere, drawing all attention.",skateboard,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a surfboard appears out of nowhere, drawing all attention.",surfboard,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a tennis racket appears out of nowhere, drawing all attention.",tennis racket,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bottle appears out of nowhere, drawing all attention.",bottle,0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a wine glass appears out of nowhere, drawing all attention.",wine glass,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a cup appears out of nowhere, drawing all attention.",cup,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a fork appears out of nowhere, drawing all attention.",fork,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a knife appears out of nowhere, drawing all attention.",knife,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a spoon appears out of nowhere, drawing all attention.",spoon,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bowl appears out of nowhere, drawing all attention.",bowl,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a banana appears out of nowhere, drawing all attention.",banana,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a apple appears out of nowhere, drawing all attention.",apple,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a sandwich appears out of nowhere, drawing all attention.",sandwich,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a orange appears out of nowhere, drawing all attention.",orange,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a broccoli appears out of nowhere, drawing all attention.",broccoli,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a carrot appears out of nowhere, drawing all attention.",carrot,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a hot dog appears out of nowhere, drawing all attention.",hot dog,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a pizza appears out of nowhere, drawing all attention.",pizza,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a donut appears out of nowhere, drawing all attention.",donut,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a cake appears out of nowhere, drawing all attention.",cake,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a chair appears out of nowhere, drawing all attention.",chair,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a couch appears out of nowhere, drawing all attention.",couch,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a potted plant appears out of nowhere, drawing all attention.",potted plant,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a bed appears out of nowhere, drawing all attention.",bed,0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1
+"An empty scene. Suddenly, a dining table appears out of nowhere, drawing all attention.",dining table,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a toilet appears out of nowhere, drawing all attention.",toilet,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a tv appears out of nowhere, drawing all attention.",tv,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a laptop appears out of nowhere, drawing all attention.",laptop,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a mouse appears out of nowhere, drawing all attention.",mouse,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a remote appears out of nowhere, drawing all attention.",remote,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a keyboard appears out of nowhere, drawing all attention.",keyboard,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a cell phone appears out of nowhere, drawing all attention.",cell phone,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a microwave appears out of nowhere, drawing all attention.",microwave,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a oven appears out of nowhere, drawing all attention.",oven,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a toaster appears out of nowhere, drawing all attention.",toaster,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a sink appears out of nowhere, drawing all attention.",sink,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a refrigerator appears out of nowhere, drawing all attention.",refrigerator,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a book appears out of nowhere, drawing all attention.",book,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a clock appears out of nowhere, drawing all attention.",clock,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a vase appears out of nowhere, drawing all attention.",vase,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a scissors appears out of nowhere, drawing all attention.",scissors,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a teddy bear appears out of nowhere, drawing all attention.",teddy bear,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a hair drier appears out of nowhere, drawing all attention.",hair drier,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
+"An empty scene. Suddenly, a toothbrush appears out of nowhere, drawing all attention.",toothbrush,0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1
