@@ -6,11 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-
-Wan2.1-T2V-1.3B/
-outputs*/
-logs/
-
 # Distribution / packaging
 .Python
 build/

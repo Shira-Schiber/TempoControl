@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners, these should be filled in appropriately as they are your "business card" -->
+  <meta name="description" content="In this work, we introduce TempoControl, a method that allows for temporal alignment of visual concepts during inference, without requiring retraining or additional supervision.">
+  <meta property="og:title" content="TempoControl: Temporal Attention Guidance for Text-to-Video Models"/>
+  <meta property="og:description" content="In this work, we introduce TempoControl, a method that allows for temporal alignment of visual concepts during inference, without requiring retraining or additional supervision."/>
+  <meta property="og:url" content="https://shira-schiber.github.io/TempoControl"/>
+  <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X630-->
+  <meta property="og:image" content="images/method.jpg" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+  <meta name="twitter:title" content="TempoControl: Temporal Attention Guidance for Text-to-Video Models">
+  <meta name="twitter:description" content="In this work, we introduce TempoControl, a method that allows for temporal alignment of visual concepts during inference, without requiring retraining or additional supervision.">
+  <!-- Path to banner image, should be in the path listed below. Optimal dimensions are 1200X600-->
+  <meta name="twitter:image" content="images/method.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Keywords for your paper to be indexed by-->
+  <meta name="keywords" content="Video generation, Text-to-Video, Temporal control, Diffusion models, Attention guidance,Computer Vision, Deep Learning, TempoControl, TempoControl">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TempoControl: Temporal Attention Guidance for Text-to-Video Models</title>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-06R2KKQYJF"></script>
+  <script src="./static/js/analytics.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/custom.css">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script defer src="./static/js/bulma-carousel.min.js"></script>
+  <script defer src="./static/js/index.js"></script>
+  <script defer src="./static/js/main.js"></script>
+  <!-- PDF.js for rendering PDF to image-like canvas -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  
+  <!-- MathJax for rendering LaTeX equations -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script async src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">TempoControl: Temporal Attention Guidance for Text-to-Video Models</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/">Shira Schiber</a><sup></sup>,</span>
+            <span class="author-block">
+              <a href="https://www.eng.biu.ac.il/lindeno/">Ofir Lindenbaum</a><sup></sup>,</span>
+            <span class="author-block">
+              <a href="https://idansc.github.io/">Idan Schwartz</a><sup></sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <p class="video-caption">Bar Ilan University</p>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- Paper coming soon -->
+              <span class="link-block">
+                <a href="#"
+                   class="external-link button is-normal is-rounded is-dark is-disabled">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>Paper (Coming Soon)</span>
+                </a>
+              </span>
+              <!-- Code coming soon -->
+              <span class="link-block">
+                <a href="https://github.com/Shira-Schiber/TempoControl"
+                   class="external-link button is-normal is-rounded is-dark is-disabled">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  
+<section class="grey-background">
+  <section class="section">
+    <div class="container is-max-desktop">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Recent advances in generative video models have enabled the creation of high-quality videos
+              based on natural language prompts. However, these models frequently lack fine-grained 
+              temporal control, meaning they do not allow users to specify when particular visual elements
+              should appear within a generated sequence.
+              In this work, we introduce <strong>TempoControl</strong>, a method that allows for temporal alignment
+              of visual concepts during inference, without requiring retraining or additional supervision.
+            </p>
+            <p>
+              TempoControl utilizes cross-attention maps, which are an inherent component of text-to-video
+              diffusion models, to guide the timing of concepts through a novel optimization approach.
+              Our method steers attention using three complementary principles: aligning its temporal
+              shape with a control signal (via correlation), amplifying it where visibility is needed
+              (via energy), and keeping it spatially focused (via entropy). TempoControl allows precise
+              control over timing while ensuring high video quality and diversity. We demonstrate its
+              effectiveness across various video generation applications, including temporal reordering
+              for single and multiple objects, as well as action and audio-aligned generation.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+</section>
+
+<!-- TempoControl Use Cases with Control Signals -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-2 has-text-centered">TempoControl Applications</h2>
+    
+    <div class="content">
+      <p class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        We use <strong>Wan 2.1-1.3B</strong> as a baseline with textual temporal cues, which we find the model largely ignores. Using the exact same seed and prompt, we then apply <strong>TempoControl</strong> optimization. We denote in <span style="color: #ff6b35; font-weight: bold;">orange</span> the words aligned with the tempo-control signal, and in <span style="color: #0000ff; font-weight: bold;">blue</span> the words assigned static temporal control, which ensures the objects remain throughout the video.
+      </p>
+      <p class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        <strong>Use the arrows to navigate through the results.</strong>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Use Case 1: Single Object Control -->
+ <section class="grey-background">
+<section class="section use-case" id="usecase1">
+  <div class="container is-max-desktop">
+    <h2 class="title is-2 has-text-centered">Single Object Control</h2>
+    
+    <div class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        Here you can see how <strong>TempoControl</strong> guides when a <strong>single object</strong> appears in the video. The baseline model (left) receives the text prompt but fails to follow the temporal instructions, while our method (right) uses an additional control signal to <strong>precisely time when objects appear exactly</strong>.
+      </p>
+    </div>
+    
+    <div class="use-case-section">
+      <div id="usecase1-carousel" class="carousel results-carousel">
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">An empty scene. Suddenly, <strong>during the last second of the video</strong>, a <span class="orange-highlight">dog</span> appears out of nowhere, drawing all attention.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase1-1" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" data-src="videos/one_object_compressed/dog 5sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" id="vid-usecase1-1" data-src="videos/one_object_compressed/dog 5sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">An empty scene. Suddenly, <strong>during the fourth second of the video</strong>, a <span class="orange-highlight">apple</span> appears out of nowhere, drawing all attention.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase1-2" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/one_object_compressed/apple 4sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase1-2" data-src="videos/one_object_compressed/apple 4sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">An empty scene. Suddenly, <strong>during the third second of the video</strong>, a <span class="orange-highlight">umbrella</span> appears out of nowhere, drawing all attention.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase1-3" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/one_object_compressed/umbrella 3sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase1-3" data-src="videos/one_object_compressed/umbrella 3sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">An empty scene. Suddenly, <strong>during the second second of the video</strong>, a <span class="orange-highlight">dog</span> appears out of nowhere, drawing all attention.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase1-4" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/one_object_compressed/bench 2sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase1-4" data-src="videos/one_object_compressed/bench 2sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">An empty scene. Suddenly, <strong>during the third second of the video</strong>, a <span class="orange-highlight">skateboard</span> appears out of nowhere, drawing all attention.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase1-5" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/one_object_compressed/skateboard 3sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase1-5" data-src="videos/one_object_compressed/skateboard 3sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</section>
+
+<!-- Use Case 2: Multiple Object Control -->
+<section class="section use-case" id="usecase2">
+  <div class="container is-max-desktop">
+    <h2 class="title is-2 has-text-centered">Multiple Object Control</h2>
+    
+    <div class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        Watch how our method handles <strong>multiple objects</strong> in one scene. The baseline (left) receives the temporal instruction but cannot execute it properly. <strong>TempoControl</strong> (right) keeps the <strong>blue object visible throughout</strong> and uses the control signal to <strong>synchronize the appearance of the orange object</strong> to only "in the second half" as instructed.
+      </p>
+    </div>
+    
+    <div class="use-case-section">
+      <div id="usecase2-carousel" class="carousel results-carousel">
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">“The video begins with a serene view centered on the <span class="blue-highlight">cat</span>, with no sign of the <span class="orange-highlight">dog</span>. Suddenly, <strong>in the second half,</strong> <span class="orange-highlight">dog</span> unexpectedly appears, altering the dynamic of the scene.”</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase2-1" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" data-src="videos/two_object_compressed/a cat and a dog vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" id="vid-usecase2-1" data-src="videos/two_object_compressed/a cat and a dog optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">The video begins with a serene view centered on <span class="blue-highlight">bird</span>, with no sign of <span class="orange-highlight">cat</span>. Suddenly, <strong>in the second half,</strong> <span class="orange-highlight">cat</span> unexpectedly appears, altering the dynamic of the scene.</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase2-2" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/two_object_compressed/a bird and a cat vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase2-2" data-src="videos/two_object_compressed/a bird and a cat optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">“The video begins with a serene view centered on the <span class="blue-highlight">wine glass</span>, with no sign of the <span class="orange-highlight">chair</span>. Suddenly, <strong>in the second half,</strong> the <span class="orange-highlight">chair</span> unexpectedly appears, altering the dynamic of the scene.”</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase2-3" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/two_object_compressed/a wine glass and a chair vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase2-3" data-src="videos/two_object_compressed/a wine glass and a chair optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">“The video begins with a serene view centered on the <span class="blue-highlight">bicycle</span>, with no sign of the <span class="orange-highlight">truck</span>. Suddenly, <strong>in the second half,</strong> the <span class="orange-highlight">truck</span> unexpectedly appears, altering the dynamic of the scene.”</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase2-4" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/two_object_compressed/a truck and a bicycle vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase2-4" data-src="videos/two_object_compressed/a truck and a bicycle optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">“The video begins with a serene view centered on the <span class="blue-highlight">sheep</span>, with no sign of the <span class="orange-highlight">horse</span>. Suddenly, <strong>in the second half,</strong> the <span class="orange-highlight">horse</span> unexpectedly appears, altering the dynamic of the scene.”</div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase2-5" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/two_object_compressed/a horse and a sheep vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase2-5" data-src="videos/two_object_compressed/a horse and a sheep optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Use Case 3: Movement Control -->
+  <section class="grey-background">
+<section class="section use-case" id="usecase3">
+  <div class="container is-max-desktop">
+    <h2 class="title is-2 has-text-centered">Movement Control</h2>
+    
+    <div class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        Beyond controlling objects, <strong>TempoControl</strong> can control <strong>when actions happen</strong>. The baseline (left) gets the text prompt but fails to time the movements correctly, while our method (right) follows the control signal <strong>to synchronize actions precisely</strong>, demonstrating temporal control over verbs and motion.
+      </p>
+    </div>
+    
+    <div class="use-case-section">
+      <div id="usecase3-carousel" class="carousel results-carousel">
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">A video of a <span class="blue-highlight">chimpanzee</span> <span class="orange-highlight">clapping</span> playfully, with a strong movement <strong>at the first second.</strong></div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase3-1" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" data-src="videos/movement_compressed/chimpanze clapping 1sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" id="vid-usecase3-1" data-src="videos/movement_compressed/chimpanze clapping 1sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">A video of a <span class="blue-highlight">wolf</span> <span class="orange-highlight">howling</span> hauntingly, with a strong movement <strong>at the second second.</strong></div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase3-2" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/movement_compressed/wolf howling 2sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase3-2" data-src="videos/movement_compressed/wolf howling 2sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">A video of a <span class="blue-highlight">man</span> <span class="orange-highlight">lifting</span> weights powerfully, with a strong movement <strong>at the third second.</strong></div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase3-3" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/movement_compressed/man lifting weights 3sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase3-3" data-src="videos/movement_compressed/man lifting weights 3sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">A video of a <span class="blue-highlight">rabbit</span> <span class="orange-highlight">thumping</span> nervously, with a strong movement <strong>at the fourth second.</strong></div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase3-4" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/movement_compressed/rabbit thumping 4second vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase3-4" data-src="videos/movement_compressed/rabbit thumping 4second optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">A video of a <span class="blue-highlight">magician</span> <span class="orange-highlight">pulling</span> a rabbit suddenly, with a strong movement <strong>at the last second.</strong></div>
+                <div class="control-signal-container">
+                  <div class="timeline-label">Temporal Control Signal</div>
+                  <svg id="plot-usecase3-5" class="timeline" viewBox="0 0 900 120" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/movement_compressed/magician pulling rabbit 5sec vanilla.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase3-5" data-src="videos/movement_compressed/magician pulling rabbit 5sec optimize.mp4" autoplay playsinline loop muted></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</section>
+
+<!-- Use Case 4: Audio-Video Alignment -->
+<section class="section use-case" id="usecase4">
+  <div class="container is-max-desktop">
+    <h2 class="title is-2 has-text-centered">Audio-Video Alignment</h2>
+    
+    <div class="content has-text-centered" style="margin-bottom: 3rem;">
+      <p style="font-size: 1.1rem; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        Here we demonstrate <strong>TempoControl</strong> ability to <strong>align visual actions with audio cues</strong>. The baseline (left) receives the text prompt but cannot synchronize visual events with audio timing, while our method (right)  aligns visual moments with the corresponding audio cues.
+      </p>
+    </div>
+    
+    <div class="use-case-section">
+      <div id="usecase4-carousel" class="carousel results-carousel">
+        
+        <!-- 1st pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  An <span class="blue-highlight">elephant</span> <span class="orange-highlight">raises</span> its trunk high and swings it forcefully as it lets out a powerful trumpet sound.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" data-src="videos/sound_compressed/elephant vanilla2.mp4" playsinline controls loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video rel="preload" as="video" id="vid-usecase4-1" data-src="videos/sound_compressed/elephant optimized2.mp4" playsinline controls loop></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2nd pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  An <span class="blue-highlight">elephant</span> <span class="orange-highlight">raises</span> its trunk high and swings it forcefully as it lets out a powerful trumpet sound.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/sound_compressed/elephant vanilla3.mp4" controls playsinline loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase4-2" data-src="videos/sound_compressed/elephant optimized3.mp4" controls playsinline loop></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3rd pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  A dark sky flashes with <span class="orange-highlight">lightning</span> as thunder cracks and clouds violently light up the landscape.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/sound_compressed/lightning vanilla1.mp4" playsinline controls loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase4-3" data-src="videos/sound_compressed/lightining optimized1.mp4" playsinline controls loop></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4th pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  A dark sky flashes with <span class="orange-highlight">lightning</span> as thunder cracks and clouds violently light up the landscape.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/sound_compressed/lightning vanilla2.mp4" controls playsinline loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase4-4" data-src="videos/sound_compressed/lightning optimized2.mp4" controls playsinline loop ></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5th pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  A <span class="blue-highlight">rooster</span> stretches its neck upward and flaps its wings as it <span class="orange-highlight">crows</span> at dawn.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/sound_compressed/rooster vanilla1.mp4" controls playsinline loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase4-5" data-src="videos/sound_compressed/rooster optimized1.mp4" controls playsinline loop></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 6th pair -->
+        <div class="carousel-item">
+          <div class="new-layout">
+            <div class="top-section">
+              <div class="control-card">
+                <div class="prompt-text">
+                  A <span class="blue-highlight">rooster</span> stretches its neck upward and flaps its wings as it <span class="orange-highlight">crows</span> at dawn.
+                </div>
+              </div>
+            </div>
+            <div class="videos-container">
+              <div class="vs-indicator">VS</div>
+              <div class="video-with-label">
+                <video preload="metadata" data-src="videos/sound_compressed/rooster vanilla2.mp4" controls playsinline loop></video>
+                <div class="video-label">Wan</div>
+              </div>
+              <div class="video-with-label">
+                <video preload="metadata" id="vid-usecase4-5" data-src="videos/sound_compressed/rooster optimized2.mp4" controls playsinline loop></video>
+                <div class="video-label">Ours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+ <section class="grey-background">
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Motivation for TempoControl</h2>
+    
+    <div class="content">
+      <p>
+      <strong>TempoControl</strong> uses <strong>inference-time optimization</strong> by <strong>steering the latent variables during the diffusion process</strong>. At each denoising step, we apply a few gradient descent iterations until a satisfactory level of temporal alignment is achieved; importantly, without updating the model parameters.
+      </p>
+      
+
+      <!-- <div class="center-video">
+  <canvas id="attention-canvas" class="pdf-image"></canvas>
+  <p class="video-caption">Attention Visualization</p>
+      </div> -->
+      <div class="center-image">
+        <img src="images/method.jpg" alt="Method Overview">
+        <p class="video-caption">Illustration of TempoControl. During a single denoising step $t$, we extract spatial attention maps $\bar{A}^t_{j,i}$ (for word $i$ at temporal index $j$), aggregate to a temporal attention signal $a_{i}^t$, and align it with the target mask vector $m_{i}$ via temporal and spatial losses. Gradients $\nabla \mathcal{L}$ are used to update the latent code $z_t$.</p>
+      </div>
+    <p>        
+      TempoControl's temporal losses rely on <strong>cross-attention maps</strong> that <strong>link words to their visual appearance</strong> in the video. Thus, steering the attention placement and strength can influence the temporal and spatial appearance of objects.
+      </p>
+      
+      <div class="center-image-attention">
+  <img src="images/attention.jpg" alt="Attention Visualization">
+  <p class="video-caption">Video generated for the prompt ``A cat and a dog.'' Before (left) and after optimization (right). Top: Spatial attention maps for the tokens <i>cat</i>> and <i>dog</i> at denoising step $t{=}3$, shown for frames $j{=}2,10,19$. Attention is overlaid on generated frames. Bottom: temporal attention $a_{i,j}^t$ (blue) vs. target mask $m_{i,j}$ (orange), with Pearson correlation loss shown.</p>
+      </div>
+      <p>
+        Our loss consists of the following components, for temporal (i) $\mathcal{L}_{\text{corr}}^t$ (ii) $\mathcal{L}_{\text{energy}}^t$, for spatial (iii) $\mathcal{L}_{\text{entropy}}^t$ (iv) $\mathcal{L}_{\text{spatial}}^t$:
+      </p>
+
+      <div style="margin: 2rem 0;">
+        <p><strong>(i) Temporal correlation term $\mathcal{L}_{\text{corr}}^t$:</strong></p>
+        <p style="margin: 1rem 0; color: #555;">
+          Encourages the temporal shape of attention to match that of an external control signal, operating on the normalized attention vector to align the presence of a concept with the desired timing.
+        </p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          $$\begin{equation}
+          \mathcal{L}_{\text{corr}}^t = -\frac{\text{Cov}(m_i, \tilde{a}_i^t)}{\sigma_{m_i} \sigma_{\tilde{a}_i^t}}
+          \end{equation}$$
+        </div>
+        
+        <p><strong>(ii) Attention energy term $\mathcal{L}_{\text{energy}}^t$:</strong></p>
+        <p style="margin: 1rem 0; color: #555;">
+          Directly promotes stronger attention in frames where the temporal signal is high, and suppresses it elsewhere, mitigating cases where correlation scores are high but attention values are too low to render the object visible.
+        </p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          $$\begin{equation}
+          \mathcal{L}_{\oplus}^t = \frac{1}{T'} \sum_{j=1}^{T'} \mathbb{1}_{\{m_{i,j} > \tau\}} \cdot a_{i,j}^t
+          \end{equation}$$
+          
+          $$\begin{equation}
+          \mathcal{L}_{\ominus}^t = \frac{1}{T'} \sum_{j=1}^{T'} \mathbb{1}_{\{m_{i,j} \leq \tau\}} \cdot a_{i,j}^t
+          \end{equation}$$
+          
+          $$\begin{equation}
+          \mathcal{L}_{\text{energy}}^t = \mathcal{L}_{\ominus}^t - \mathcal{L}_{\oplus}^t
+          \end{equation}$$
+        </div>
+
+        <p><strong>(iii) Entropy regularization $\mathcal{L}_{\text{entropy}}^t$:</strong></p>
+        <p style="margin: 1rem 0; color: #555;">
+          Maintains spatial focus, ensuring that when attention is activated, it remains coherent and not diffusely spread across the frame.
+        </p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          $$\begin{equation}
+          \mathcal{L}_{\text{entropy}}^t = \frac{1}{T'} \sum_{j=1}^{T'} \mathbb{1}[m_{i,j} > \tau] \cdot \mathcal{H}(\bar{A}^{t}_{j,i})
+          \end{equation}$$
+        </div>
+
+        <p><strong>(iv) Spatial consistency penalty $\mathcal{L}_{\text{spatial}}^t$:</strong></p>
+        <p style="margin: 1rem 0; color: #555;">
+          Maintains spatial consistency by penalizing deviations between the initial and optimized spatial attention maps for the target word.
+        </p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          $$\begin{equation}
+          \mathcal{L}_{\text{spatial}}^t = \left\| \sum_{j=1}^{T'} \left( \hat{A}^{t}_{j,i} - \bar{A}^{t}_{j,i} \right) \right\|_2^2
+          \end{equation}$$
+        </div>
+
+        <p><strong>Total Loss:</strong></p>
+        <div style="text-align: center; margin: 1.5rem 0;">
+          $$\begin{equation}
+          \mathcal{L}^t = \lambda_1 \mathcal{L}_{\text{corr}}^t + \lambda_2 \mathcal{L}_{\text{energy}}^t + \lambda_3 \mathcal{L}_{\text{entropy}}^t + \lambda_4 \mathcal{L}_{\text{spatial}}^t
+          \end{equation}$$
+        </div>
+        <p style="font-size: 0.95rem; color: #666;">
+          where $\lambda_1, \lambda_2, \lambda_3, \lambda_4$ are hyperparameters that balance the contributions of each loss term.
+        </p>
+      </div>
+
+</section>
+</section>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <p>If you find this project useful for your research, please cite the following:
+    </p>
+    <pre><code>@misc{TempoControl2025,
+Author = {Shira Schiber and Ofir Lindenbaum and Idan Schwartz},
+Title = {TempoControl: Temporal Attention Guidance for Text-to-Video Models},
+Year = {2025},
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/Shira-Schiber" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Website source code based on the
+            <a rel="Nerfies"
+               href="https://nerfies.github.io/">Nerfies</a>
+             project page. If you want to reuse their
+             <a rel="source code"
+               href="https://github.com/nerfies/nerfies.github.io">source code</a>, please credit them appropriately.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+
+</body>
+</html>
+

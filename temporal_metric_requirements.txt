@@ -1,6 +1,0 @@
-argparse
-pandas
-opencv-python
-numpy
-ultralytics==8.1.34  
-tqdm
