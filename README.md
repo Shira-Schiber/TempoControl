@@ -26,7 +26,7 @@ for single and multiple objects, as well as action and audio-aligned generation.
 
 ## Hardware Requirements
 
-- Single NVIDIA H200 GPU
+About 110 GB of memory on a single GPU
 
 ## Environment and Model Preparation
 
@@ -112,8 +112,9 @@ pip install -r temporal_metric_requirements.txt
 For one object temporal accuracy evaluation:
 
 ```bash
-python temporal_accuracy_one_object.py   --videos_path \ 
-  <outputs_one_object_benchmark>  --output_path <outputs_one_object_benchmark> \
+python temporal_accuracy_one_object.py   \
+  --videos_path <outputs_one_object_benchmark> \
+  --output_path <outputs_one_object_benchmark> \
   --csv_file "data/one_object.csv"
 ```
 
@@ -123,14 +124,14 @@ For two objects temporal accuracy evaluation:
   python temporal_accuracy_two_objects.py \
   --videos_path <outputs_two_objects_benchmark> \
   --output_path "<outputs_two_objects_benchmark> \
-  --csv_file "data/two_objects.csv" \
+  --csv_file "data/two_objects.csv"
 ```
 
 For action temporal accuracy evaluation:
 
 ```bash
 python temporal_accuracy_action.py \
-  --videos_path <outputs_action_benchmark> \ 
+  --videos_path <outputs_action_benchmark> \
   --output_path <outputs_action_benchmark> \
   --csv_file "data/action.csv"
 ```
