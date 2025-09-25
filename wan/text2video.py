@@ -22,25 +22,20 @@ import torch.nn.functional as TF
 import logging
 import os
 from wan.utils.utils import cache_video
-from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
 from torch.utils.checkpoint import checkpoint
-from scipy.interpolate import interp1d
 
 from .distributed.fsdp import shard_model
-from .modules.model import WanModel
 from .modules.model import WanModel
 from .modules.t5 import T5EncoderModel
 from .modules.vae import WanVAE
 from .utils.fm_solvers import (FlowDPMSolverMultistepScheduler,
                                get_sampling_sigmas, retrieve_timesteps)
 from .utils.fm_solvers_unipc import FlowUniPCMultistepScheduler
-from PIL import Image
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import yaml
 import scipy.ndimage
-from .utils.gaussian_smoothing import GaussianSmoothing
 
 
 def load_yaml_config(config_path):
@@ -68,6 +63,7 @@ def save_attention_video(attn_map, token_text, save_dir, fps=4, name="", retry=5
     else:
         save_path = os.path.join(save_dir, f"{token_text.replace(' ', '_')}.mp4")
     os.makedirs(save_dir, exist_ok=True)
+    attn_map = attn_map.to(torch.float32)
 
     h, w = 240, 416  
     error = None
@@ -239,7 +235,6 @@ class WanT2V:
             dist.barrier()
         if dit_fsdp:
             self.model = shard_fn(self.model)
-            self.model.save_attention = True
         else:
             self.model.to(self.device)
 
@@ -462,7 +457,11 @@ class WanT2V:
             input_prompt (`str`):
                 Text prompt for content generation
             audio_path (`str`, *optional*):
-                Path to audio file for synchronization
+                Path to audio file for aligning visual events to audio
+            token_num (`int` or `List[int]`, *optional*, defaults to -1):
+                Token index (or list of indices) in the prompt to be temporally controlled during generation.
+            token_num2 (`int` or `List[int]`, *optional*, defaults to None):
+                A second token index (or list of indices) for additional temporal control.
             size (tuple[`int`], *optional*, defaults to (1280,720)):
                 Controls video resolution, (width,height).
             frame_num (`int`, *optional*, defaults to 81):
@@ -481,10 +480,6 @@ class WanT2V:
                 Random seed for noise generation.
             offload_model (`bool`, *optional*, defaults to True):
                 Offloads models to CPU to save VRAM
-            token_num (`int` or `List[int]`, *optional*, defaults to -1):
-                Token index (or list of indices) in the prompt to be temporally controlled during generation.
-            token_num2 (`int` or `List[int]`, *optional*, defaults to None):
-                A second token index (or list of indices) for additional temporal control.
             control_signal1 (`List[int]`, *optional*, defaults to None):
                 Temporal control signal for `token_num`, indicating when the corresponding concept should temporally appear.
             control_signal2 (`List[int]`, *optional*, defaults to None):
@@ -701,7 +696,7 @@ class WanT2V:
 
                                     noise_pred = noise_pred_uncond + guide_scale * (noise_pred_cond - noise_pred_uncond)
                                     predicted_x0 = sample_scheduler.convert_model_output(model_output=noise_pred, sample=latents[0])
-
+                                    
                                     # Compute the average of cross attention across all layers
                                     # See the "Cross-attention in text-to-video diffusion models" subsection under "Preliminaries" in the paper.
                                     attention_maps_avg = compute_average_attention(attention_maps_output, counter_attention_output)

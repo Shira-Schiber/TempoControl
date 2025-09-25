@@ -35,6 +35,8 @@ To get started, first create and activate a Conda environment with Python 3.12, 
 ```bash
 conda create -n tempo_control python=3.12
 conda activate tempo_control
+
+# If the installation of `flash_attn` fails, try installing the other packages first and install `flash_attn` last
 pip install -r requirements.txt
 ```
 
@@ -56,7 +58,7 @@ To generate videos with TempoControl, run:
 This script includes examples for single object, two objects, action, and audio-video alignment. 
 Edit it for your specific use case.
 
-### Inference on Benchmarks
+## Inference on Benchmarks
 
 The `data` directory contains the benchmark datasets used for evaluation, one-object, two-object, and action benchmarks.
 
@@ -81,7 +83,7 @@ or
 ```
 
 
-### Evaluate with VBench metrics
+## Evaluation with VBench Metrics
 
 First, follow the [Vbench installation instructions](https://github.com/Vchitect/VBench?tab=readme-ov-file#hammer-installation) in a seperate conda environment.
 
@@ -98,7 +100,7 @@ Once installed, run the following command inside the created env to evaluate you
 This will compute the VBench metrics for the videos in the outputs directory.
 
 
-### Evaluate Temproal Accuracy
+## Evaluation of Temporal Accuracy
 
 First, create the conda environment:
 
@@ -109,29 +111,28 @@ pip install -r temporal_metric_requirements.txt
 ```
 
 
-For one object temporal accuracy evaluation:
+To evaluate temporal accuracy, use:
 
 ```bash
-python temporal_accuracy_one_object.py   \
-  --videos_path <outputs_one_object_benchmark> \
-  --output_path <outputs_one_object_benchmark> \
-  --csv_file "data/one_object.csv"
+python temporal_accuracy_benchmark.py --benchmark one-object
 ```
 
-For two objects temporal accuracy evaluation:
+Replace `one-object` with `two-object` or `action` for other benchmarks. By default, the script uses the standard video, output, and CSV paths from the inference benchmarks.
+
+**Arguments:**
+- `--benchmark` (**required**): one-object, two-object, or action
+- `--videos_path`: (optional) directory with videos (default: matching outputs folder)
+- `--output_path`: (optional) where to save results (default: same as videos_path)
+- `--csv_file`: (optional) CSV with prompts and timing (default: matching file in `data/`)
+
+To use custom paths:
 
 ```bash
-  python temporal_accuracy_two_objects.py \
-  --videos_path <outputs_two_objects_benchmark> \
-  --output_path "<outputs_two_objects_benchmark> \
-  --csv_file "data/two_objects.csv"
+python temporal_accuracy_benchmark.py --benchmark one-object \
+  --videos_path custom_outputs/one-object \
+  --output_path metrics/one-object \
+  --csv_file data/one_object.csv
 ```
 
-For action temporal accuracy evaluation:
-
-```bash
-python temporal_accuracy_action.py \
-  --videos_path <outputs_action_benchmark> \
-  --output_path <outputs_action_benchmark> \
-  --csv_file "data/action.csv"
-```
+**Output:**
+Each run creates a JSON file (e.g., `temporal_accuracy_one_object.json`) in the output directory. This file contains overall accuracy and per-video results.

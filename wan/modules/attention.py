@@ -2,7 +2,6 @@
 # type: ignore
 
 import torch
-import os
 import torch.nn.functional as F
 try:
     import flash_attn_interface
@@ -57,15 +56,14 @@ def flash_attention(
         If return_attn=False: output tensor [B, Lq, Nq, C2].
         If return_attn=True: tuple (output, attention_weights), where attention_weights is [B, Nq, Lq, Lk].
     """
-    # raise Exception("flash_attention is running!")
     half_dtypes = (torch.float16, torch.bfloat16)
     assert dtype in half_dtypes
     assert q.device.type == 'cuda' and q.size(-1) <= 256
 
     # params
     b, lq, lk, out_dtype = q.size(0), q.size(1), k.size(1), q.dtype
-    nheads = q.size(2)  # Nq (number of heads)
-    head_dim = q.size(3)  # C1 (head dimension
+    nheads = q.size(2)
+    head_dim = q.size(3)
 
     def half(x):
         return x if x.dtype in half_dtypes else x.to(dtype)
@@ -111,14 +109,15 @@ def flash_attention(
             attn = F.softmax(attn_scores, dim=-1) #.detach()  # [B, Nq, Lq, Lk]
         except Exception as e:
             raise Exception(f"Error computing manual attention map: {e}")
-
+          
 
     if q_scale is not None:
         q = q * q_scale
 
     if version is not None and version == 3 and not FLASH_ATTN_3_AVAILABLE:
         warnings.warn(
-            'Flash attention 3 is not available, use flash attention 2 instead.'
+            'Flash attention 3 is not ' \
+            'available, use flash attention 2 instead.'
         )
 
     # apply attention

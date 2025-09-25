@@ -21,3 +21,4 @@ librosa
 scipy
 opencv-python
 matplotlib
+pandas
