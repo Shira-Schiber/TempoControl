@@ -1,7 +1,8 @@
 # TempoControl: Temporal Attention Guidance for Text-to-Video Models
+
 <div align="center">
-<a href="https://shira-schiber.github.io/TempoControl/"><img src="https://img.shields.io/static/v1?label=Project&message=Website&color=red" height=20.5></a> 
- <a href=""><img src="https://img.shields.io/badge/arXiv-2306.00966-b31b1b.svg" height=20.5></a>
+<a href="https://shira-schiber.github.io/TempoControl/"><img src="https://img.shields.io/static/v1?label=Project&message=Website&color=red" height=20.5></a>
+<a href="https://arxiv.org/abs/2510.02226"><img src="https://img.shields.io/badge/arXiv-2510.02226-b31b1b.svg" height=20.5></a>
 </div>
 
 The code is based on the original [Wan2.1-T2V-1.3B](https://github.com/Wan-Video/Wan2.1) implementation, with additional modifications for TempoControl.
@@ -114,7 +115,7 @@ pip install -r temporal_metric_requirements.txt
 To evaluate temporal accuracy, use:
 
 ```bash
-python temporal_accuracy_benchmark.py --benchmark one-object
+python temporal_accuracy.py --benchmark one-object
 ```
 
 Replace `one-object` with `two-object` or `action` for other benchmarks. By default, the script uses the standard video, output, and CSV paths from the inference benchmarks.
@@ -128,7 +129,7 @@ Replace `one-object` with `two-object` or `action` for other benchmarks. By defa
 To use custom paths:
 
 ```bash
-python temporal_accuracy_benchmark.py --benchmark one-object \
+python temporal_accuracy.py --benchmark one-object \
   --videos_path custom_outputs/one-object \
   --output_path metrics/one-object \
   --csv_file data/one_object.csv
