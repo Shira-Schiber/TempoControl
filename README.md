@@ -5,6 +5,20 @@
 <a href="https://arxiv.org/abs/2510.02226"><img src="https://img.shields.io/badge/arXiv-2510.02226-b31b1b.svg" height=20.5></a>
 </div>
 
+<div align="center">
+
+<video src="TempoControl_demo.mp4"
+       width="640"
+       controls
+       autoplay
+       loop
+       playsinline
+       style="border:1px solid #ccc; border-radius:6px; max-width:100%; height:auto;">
+  Your browser does not support the video tag.
+</video>
+<br/>
+</div>
+
 The code is based on the original [Wan2.1-T2V-1.3B](https://github.com/Wan-Video/Wan2.1) implementation, with additional modifications for TempoControl.
 
 
