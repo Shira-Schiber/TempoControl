@@ -4,7 +4,7 @@ ONE_OBJECT_CONFIG_PATH="configs/one_object_config.yaml"
 TWO_OBJECTS_CONFIG_PATH="configs/two_objects_config.yaml"
 ACTION_CONFIG_PATH="configs/action_config.yaml"
 SOUND_CONFIG_PATH="configs/sound_config.yaml"
-OUTPUT_DIR="outputs_temporal_control_env"
+OUTPUT_DIR="outputs"
 
 mkdir -p "$OUTPUT_DIR"
 
