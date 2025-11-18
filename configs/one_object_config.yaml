@@ -6,8 +6,7 @@ optimization:
   update_per_step: 10  # Number of updates per denoise steps
   pearson_threshold: 0.9  # Pearson threshold 
   lr: 0.0005  # Learning rate for optimization
-  penalty_weight: 1  # Weight for the spatial consistency penalty term in the loss function
-  energy_weight: 1 # Weight for the entropy term in the loss function
+  magnitude_weight: 0.3 # Weight for the magnitude term in the loss function
   entropy_weight: 10  # Weight for the entropy term in the loss function
   pearson_weight: 1
   optimize_two: false  # Whether to optimize two control signal at once, if false optimize just the first

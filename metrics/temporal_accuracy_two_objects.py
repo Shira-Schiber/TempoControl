@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import cv2
 import numpy as np
-from ultralytics import YOLOv10
+from ultralytics import YOLO
 from tqdm import tqdm
 import json
 
@@ -115,7 +115,7 @@ def parse_frame_config(config_str):
 def main(args):
     # Find the CSV file in the videos_path directory
     csv = pd.read_csv(args.csv_file)
-    model = YOLOv10.from_pretrained('jameslahm/yolov10x')
+    model = YOLO("yolov10n.pt")
     results_list = []
 
     total_static_success = 0

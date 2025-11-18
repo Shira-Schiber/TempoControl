@@ -289,15 +289,15 @@ class WanT2V:
         return token_map
     
 
-    def energy_loss_term(self, attention_map, token_idx, audio_signal):
+    def energy_loss_term(self, attention_map, token_idx, control_signal):
         """
-        Compute attention energy term
-        See the "Attention energy term" subsection under "Method" in the paper.
+        Compute attention magnitude term
+        See the "Attention magnitude term" subsection under "Method" in the paper.
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
         # Get indices where a_i^t is above 0.7
-        valid_frame_indices = (audio_signal > 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
+        valid_frame_indices = (control_signal > 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
         
         if valid_frame_indices.numel() == 0:
             return torch.tensor(0.0, device=attention_map.device)  # or handle as needed
@@ -311,15 +311,15 @@ class WanT2V:
 
         return -mean_energy
 
-    def neg_energy_loss_term(self, attention_map, token_idx, audio_signal):
+    def neg_energy_loss_term(self, attention_map, token_idx, control_signal):
         """
-        Compute attention energy term
-        See the "Attention energy term" subsection under "Method" in the paper.
+        Compute attention magnitude term
+        See the "Attention magnitude term" subsection under "Method" in the paper.
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
-        # Get indices where the audio signal is above 0.7
-        valid_frame_indices = (audio_signal < 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
+        # Get indices where the control signal is above 0.7
+        valid_frame_indices = (control_signal < 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
         
         if valid_frame_indices.numel() == 0:
             return torch.tensor(0.0, device=attention_map.device)  # or handle as needed
@@ -334,14 +334,14 @@ class WanT2V:
     
 
 
-    def get_entropy(self, attention_map, token_idx, audio_signal):
+    def get_entropy(self, attention_map, token_idx, control_signal):
         """
         Compute entropy regularization
-        See the "Entropy regularization" subsection under "Method" in the paper.
+        See the "Attention entropy regularization" subsection under "Method" in the paper.
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
-        valid_indices = (audio_signal > 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
+        valid_indices = (control_signal > 0.7).nonzero(as_tuple=True)[0]  # shape: (N,)
 
         if valid_indices.numel() == 0:
             return torch.tensor(0.0, device=attention_map.device)  # or handle as appropriate
@@ -379,7 +379,7 @@ class WanT2V:
     def compute_penalty(self, attention_map, attention_map_original, token_idx):
         """
          Compute spatial consistency penalty
-         See the "Spatial consistency penalty" subsection under "Method" in the paper.
+         This term is not necessary anymore.
         Args:
             attention_map: [1, 12, 32760, 512] tensor the attention map in current step
             attention_map_original: [1, 12, 32760, 512] tensor the original attention map before optinization
@@ -400,7 +400,7 @@ class WanT2V:
     def pearson_loss(self, attention_signal, control_signal,  output_dir=None, output_name="plot.png"):
         """
         Compute the pearson correlation loss
-        See the "Correlation-based early stopping" subsection under "Method" in the paper.
+        See the "Temporal correlation term" subsection under "Method" in the paper.
         """
         
         attention_deriv = attention_signal[1:-1]
@@ -431,6 +431,9 @@ class WanT2V:
             base_name = os.path.splitext(output_name)[0]
             motion_path = os.path.join(output_dir, f"{base_name}_motion_deriv.pt")
             audio_path = os.path.join(output_dir, f"{base_name}_audio_deriv.pt")
+
+            # torch.save(attention_signal.detach().cpu(), motion_path)
+            # torch.save(control_signal.detach().cpu(), audio_path)
         return loss
 
     def generate(self,
@@ -572,8 +575,8 @@ class WanT2V:
             optimization_correlation_based_steps = self.config_yaml.get('optimization', {}).get('correlation_based_steps', False)
             pearson_threshold = self.config_yaml.get('optimization', {}).get('pearson_threshold')
             diffusion_steps_range = self.config_yaml.get('diffusion', {}).get('diffusion_steps_range', [0,1,2,3,4,5,6,7,8,9,10])
-            penalty_weight = self.config_yaml.get('optimization', {}).get('penalty_weight')
-            energy_weight = self.config_yaml.get('optimization', {}).get('energy_weight')
+            penalty_weight = self.config_yaml.get('optimization', {}).get('penalty_weight', 0)
+            energy_weight = self.config_yaml.get('optimization', {}).get('energy_weight', 0)
             entropy_weight = self.config_yaml.get('optimization', {}).get('entropy_weight', 0)
             pearson_weight = self.config_yaml.get('optimization', {}).get('pearson_weight',1)
             optimize_two = self.config_yaml.get('optimization', {}).get('optimize_two',False)
@@ -649,7 +652,7 @@ class WanT2V:
                             if -loss.item() > pearson_threshold:
                                 logging.info(f"Skipping optimization at step {i} as loss {-loss.item()} is already below target loss {pearson_threshold}")
                                 optimize = False
-                            visualize_token_attention(avg_map, [input_prompt], self.text_encoder.tokenizer, save_dir=output_dir, select=0, token_idx=None, name=f"attention_map_{i:03d}_mean_token_before_sync")
+                            visualize_token_attention(avg_map, [input_prompt], self.text_encoder.tokenizer, save_dir=output_dir, select=0, token_idx=token_num2, name=f"attention_map_{i:03d}_mean_token_before_sync")
                             noise_pred_cond = noise_pred_cond_raw[0]
                             noise_pred_uncond = self.model([latents[0]], t=timestep, **arg_null)[0]
                             noise_pred = noise_pred_uncond + guide_scale * (noise_pred_cond - noise_pred_uncond)
@@ -779,7 +782,7 @@ class WanT2V:
                                 avg_map = compute_average_attention(attention_maps_output, counter_attention_output)
                                 attention_signal1 = self.compute_attention_strength_signal(avg_map, token_num)
                                 loss = self.pearson_loss(attention_signal1, control_signal1, output_dir=output_dir, output_name=f"loss_plot_{i:03d}_after_sync.png")
-                                visualize_token_attention(avg_map, [input_prompt], self.text_encoder.tokenizer, save_dir=output_dir, select=0, token_idx=None, name=f"attention_map_{i:03d}_mean_token_after_sync")
+                                visualize_token_attention(avg_map, [input_prompt], self.text_encoder.tokenizer, save_dir=output_dir, select=0, token_idx=token_num2, name=f"attention_map_{i:03d}_mean_token_after_sync")
                                 noise_pred_cond = noise_pred_cond_raw[0]
 
                                 noise_pred_uncond = self.model([latents[0]], t=timestep, **arg_null)[0]

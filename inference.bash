@@ -24,9 +24,9 @@ python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wa
 ############# TWO OBJECTS #############
 
 python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wan2.1-T2V-1.3B \
---prompt "The video begins with a serene view centered on the bird, with no sign of the cat. In the second half, the cat unexpectedly appears, altering the dynamic of the scene." \
---token1 "cat" \
---token2 "bird" \
+--prompt "The video begins with a serene view centered on the kitten, with no sign of the puppy. In the second half, the puppy unexpectedly appears, altering the dynamic of the scene." \
+--token1 "puppy" \
+--token2 "kitten" \
 --control_signal1 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 \
 --control_signal2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 \
 --config_path "$TWO_OBJECTS_CONFIG_PATH" \
@@ -35,20 +35,20 @@ python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wa
 --sample_shift 3.0
 
 
-############# ACTION #############
+# ############# ACTION #############
 
 python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wan2.1-T2V-1.3B \
---prompt "A video of a wolf howling hauntingly, with a strong movement at the second second." \
---token1 "howling" \
---token2 "wolf" \
---control_signal1 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 \
+--prompt "A video of a lion walking regally, with a strong movement at the last second." \
+--token1 "walking" \
+--token2 "lion" \
+--control_signal1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 \
 --control_signal2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 \
 --config_path "$ACTION_CONFIG_PATH" \
 --save_file "$OUTPUT_DIR" \
 --sample_guide_scale 6.0 \
 --sample_shift 3.0
 
-############# SOUND #############
+# ############# SOUND #############
 
 python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wan2.1-T2V-1.3B \
 --prompt "An elephant raises its trunk high and swings it forcefully as it lets out a powerful trumpet sound." \

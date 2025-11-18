@@ -621,11 +621,7 @@ class WanModel(ModelMixin, ConfigMixin):
             return [u.float() for u in x], attention_maps, counter_attention_maps
             
         else:
-            return [u.float() for u in x]
-
-    def get_average_attention(self):
-        return self.attention_maps["cross"] / self.counter_attention_maps[0] 
-    
+            return [u.float() for u in x] 
     
     def unpatchify(self, x, grid_sizes):
         r"""
