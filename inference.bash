@@ -12,9 +12,9 @@ mkdir -p "$OUTPUT_DIR"
 ############# ONE OBJECT #############
 
 python generate.py --task t2v-1.3B --base_seed 42 --size 832*480 --ckpt_dir ./Wan2.1-T2V-1.3B \
---prompt "An empty scene. Suddenly, a umbrella appears out of nowhere, drawing all attention." \
---token1 "umbrella" \
---control_signal1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 \
+--prompt "An empty scene. Suddenly, during the last second of the video, a cell phone appears out of nowhere, drawing all attention.-0" \
+--token1 "cell phone" \
+--control_signal1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 \
 --config_path "$ONE_OBJECT_CONFIG_PATH" \
 --save_file "$OUTPUT_DIR" \
 --sample_guide_scale 6.0 \

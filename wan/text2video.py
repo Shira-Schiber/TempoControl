@@ -244,7 +244,7 @@ class WanT2V:
     def extract_audio_features(self, audio_path, sr=22050, temporal_num_frames=21, hop_length=512, threshold=0.7, sigma=2):
         """
         Extract temporal control signal from audio to align visual events accordingly.
-        See the "Audio-Visual Alignment" subsection under "Experiments" in the paper.
+        See the "Audio-Visual Alignment" subsection under "Experiments" in the paper, equation (9)
         """
         y, sr = librosa.load(audio_path, sr=sr)
         onset_env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop_length)
@@ -292,7 +292,7 @@ class WanT2V:
     def energy_loss_term(self, attention_map, token_idx, control_signal):
         """
         Compute attention magnitude term
-        See the "Attention magnitude term" subsection under "Method" in the paper.
+        See the "Attention magnitude term" subsection under "Method" in the paper, equation (5).
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
@@ -314,7 +314,7 @@ class WanT2V:
     def neg_energy_loss_term(self, attention_map, token_idx, control_signal):
         """
         Compute attention magnitude term
-        See the "Attention magnitude term" subsection under "Method" in the paper.
+        See the "Attention magnitude term" subsection under "Method" in the paper, equation (6).
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
@@ -337,7 +337,7 @@ class WanT2V:
     def get_entropy(self, attention_map, token_idx, control_signal):
         """
         Compute entropy regularization
-        See the "Attention entropy regularization" subsection under "Method" in the paper.
+        See the "Attention entropy regularization" subsection under "Method" in the paper, equation (8).
         """
         token_map = self.get_attention_map(attention_map, token_idx)  # shape: (T, H, W)
         
@@ -400,7 +400,7 @@ class WanT2V:
     def pearson_loss(self, attention_signal, control_signal,  output_dir=None, output_name="plot.png"):
         """
         Compute the pearson correlation loss
-        See the "Temporal correlation term" subsection under "Method" in the paper.
+        See the "Temporal correlation term" subsection under "Method" in the paper, equation (4).
         """
         
         attention_deriv = attention_signal[1:-1]
@@ -576,7 +576,7 @@ class WanT2V:
             pearson_threshold = self.config_yaml.get('optimization', {}).get('pearson_threshold')
             diffusion_steps_range = self.config_yaml.get('diffusion', {}).get('diffusion_steps_range', [0,1,2,3,4,5,6,7,8,9,10])
             penalty_weight = self.config_yaml.get('optimization', {}).get('penalty_weight', 0)
-            energy_weight = self.config_yaml.get('optimization', {}).get('energy_weight', 0)
+            energy_weight = self.config_yaml.get('optimization', {}).get('magnitude_weight', 0)
             entropy_weight = self.config_yaml.get('optimization', {}).get('entropy_weight', 0)
             pearson_weight = self.config_yaml.get('optimization', {}).get('pearson_weight',1)
             optimize_two = self.config_yaml.get('optimization', {}).get('optimize_two',False)
@@ -589,7 +589,7 @@ class WanT2V:
                 y, sr = librosa.load(audio_path, sr=22050)
                 duration = librosa.get_duration(y=y, sr=sr)
                 # Extract temporal control signal from audio to align visual events accordingly.
-                # See the "Audio-Visual Alignment" subsection under "Experiments" in the paper.
+                # See the "Audio-Visual Alignment" subsection under "Experiments" in the paper, equation (9).
                 hop_length = int(duration * sr // temporal_num_frames + 1)
                 control_signal1 , sr, hop_length = self.extract_audio_features(audio_path)                 
 
@@ -701,30 +701,31 @@ class WanT2V:
                                     predicted_x0 = sample_scheduler.convert_model_output(model_output=noise_pred, sample=latents[0])
                                     
                                     # Compute the average of cross attention across all layers
-                                    # See the "Cross-attention in text-to-video diffusion models" subsection under "Preliminaries" in the paper.
+                                    # See the "Cross-attention in video diffusion models" subsection under "Preliminaries" in the paper.
                                     attention_maps_avg = compute_average_attention(attention_maps_output, counter_attention_output)
                                     if opt_iter == 0:
                                         attention_maps_avg_original = attention_maps_avg.clone().detach()
 
                                     # Compute a_i^t
-                                    # See the "Cross-attention in text-to-video diffusion models" subsection under "Preliminaries" in the paper.
+                                    # See the "Cross-attention in video diffusion models" subsection under "Preliminaries" in the paper, equation (2)
                                     attention_signal1 = self.compute_attention_strength_signal(attention_maps_avg, token_num)
 
-                                    # Compute spatial consistency penalty
-                                    # See the "Spatial consistency penalty" subsection under "Method" in the paper.
+                                    # This term is not necessary anymore, in default it is zero
                                     penalty = self.compute_penalty(attention_maps_avg, attention_maps_avg_original, token_num)
 
                                     # Compute temporal correlation term
-                                    # See the "Temporal correlation term" subsection under "Method" in the paper.
+                                    # See the "Temporal correlation term" subsection under "Method" in the paper, equation (4)
                                     loss = self.pearson_loss(attention_signal1, control_signal1)
 
-                                    # Compute attention energy term
-                                    # See the "Attention energy term" subsection under "Method" in the paper.
+                                    # Compute attention magnitude term
+                                    # See the "Attention magnitude term" subsection under "Method" in the paper, equation (5)
                                     energy_loss_term = self.energy_loss_term(attention_maps_avg, token_num, control_signal1)
+
+                                    # # See the "Attention magnitude term" subsection under "Method" in the paper, equation (6)
                                     neg_energy_loss_term = self.neg_energy_loss_term(attention_maps_avg, token_num, control_signal1)
 
                                     # Compute entropy regularization
-                                    # See the "Entropy regularization" subsection under "Method" in the paper.
+                                    # See the "Attention entropy regularization" subsection under "Method" in the paper, equation (8)
                                     entropy_step = self.get_entropy(attention_maps_avg, token_num, control_signal1)
                                     
 
@@ -747,12 +748,12 @@ class WanT2V:
                                         logging.info(f"second token: Step {i}, Opt iter {opt_iter+1}/{update_per_step}, Loss: {loss2.item():.4f}, Penalty: {penalty2.item() * penalty_weight:.4f}, energy_loss_term: {energy_loss_term2.item() * energy_weight:.4f}, neg_energy_loss_term: {neg_energy_loss_term2.item() * energy_weight:.4f}, entropy_step: {entropy_step2 * entropy_weight:.4f}, ")
 
                                         # Commpute full objective
-                                        # See the "Full objective" subsection under "Method" in the paper.
+                                        # See the "Full objective" subsection under "Method" in the paper, equation (9)
                                         loss = (loss +loss2)/2 * pearson_weight + (energy_loss_term + energy_loss_term2)/2 * energy_weight +  (penalty+penalty2)/2 * penalty_weight  + (entropy_step + entropy_step2)/2 * entropy_weight + (neg_energy_loss_term + neg_energy_loss_term2)/2 * energy_weight 
                                     else:
 
                                         # Commpute full objective
-                                        # See the "Full objective" subsection under "Method" in the paper.
+                                        # See the "Full objective" subsection under "Method" in the paper, equation (9)
                                         logging.info(f"Step {i}, Opt iter {opt_iter+1}/{update_per_step}, Loss: {pearson_weight * loss.item():.4f}, Penalty: {penalty.item() * penalty_weight:.4f}, energy_loss_term: {energy_loss_term.item() * energy_weight:.4f}, neg_energy_loss_term: {neg_energy_loss_term.item() * energy_weight:.4f}, entropy_step: {entropy_step * entropy_weight:.4f}, ")
                                         loss = loss * pearson_weight + energy_loss_term * energy_weight + penalty * penalty_weight + entropy_step * entropy_weight + neg_energy_loss_term * energy_weight 
 
