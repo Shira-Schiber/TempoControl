@@ -6,6 +6,8 @@
 </div>
 
 <div align="center">
+<br/>
+</div>
 
 The code is based on the original [Wan2.1-T2V-1.3B](https://github.com/Wan-Video/Wan2.1) implementation, with additional modifications for TempoControl.
 
