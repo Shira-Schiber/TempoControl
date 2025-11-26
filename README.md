@@ -63,6 +63,8 @@ To generate videos with TempoControl, run:
 This script includes examples for single object, two objects, action, and audio-video alignment. 
 Edit it for your specific use case.
 
+For MultiGPU runs, you can use the --ulysses_size option. Refer to the Wan2.1 Documentation for more information.
+
 ## Inference on Benchmarks
 
 The `data` directory contains the benchmark datasets used for evaluation, one-object, two-object, and action benchmarks.

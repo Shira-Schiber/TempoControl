@@ -5,6 +5,9 @@ from xfuser.core.distributed import (get_sequence_parallel_rank,
                                      get_sequence_parallel_world_size,
                                      get_sp_group)
 from xfuser.core.long_ctx_attention import xFuserLongContextAttention
+import torch.distributed as dist
+from torch.distributed.nn.functional import all_gather as ddp_all_gather
+
 
 from ..modules.model import sinusoidal_embedding_1d
 
@@ -71,12 +74,19 @@ def usp_dit_forward(
     seq_len,
     clip_fea=None,
     y=None,
+    save_attention=False,
+    cross_attention={},
+    counter_att_maps=[0]
 ):
     """
     x:              A list of videos each with shape [C, T, H, W].
     t:              [B].
     context:        A list of text embeddings each with shape [L, C].
     """
+
+    import torch.distributed as dist
+    rank = dist.get_rank() if dist.is_initialized() else 0
+
     if self.model_type == 'i2v':
         assert clip_fea is not None and y is not None
     # params
@@ -119,7 +129,7 @@ def usp_dit_forward(
         context = torch.concat([context_clip, context], dim=1)
 
     # arguments
-    kwargs = dict(
+    kwargs_not_save_am = dict(
         e=e0,
         seq_lens=seq_lens,
         grid_sizes=grid_sizes,
@@ -127,24 +137,68 @@ def usp_dit_forward(
         context=context,
         context_lens=context_lens)
 
+    kwargs_save_am = dict(
+        e=e0,
+        seq_lens=seq_lens,
+        grid_sizes=grid_sizes,
+        freqs=self.freqs,
+        context=context,
+        context_lens=context_lens,
+        save_attention=save_attention,
+        attention_maps=cross_attention,
+        counter_attention_maps= counter_att_maps,
+    )
     # Context Parallel
     x = torch.chunk(
         x, get_sequence_parallel_world_size(),
         dim=1)[get_sequence_parallel_rank()]
 
-    for block in self.blocks:
-        x = block(x, **kwargs)
 
+    for i,block in enumerate(self.blocks):
+        if i > -1:
+            kwargs_save_am['block_number'] = i
+            if save_attention:
+                x, attention_maps, counter_attention_maps = block(x, **kwargs_save_am)
+                # with open ('debug_usp_dit_forward.txt', 'a') as f:
+                #     f.write(f"attention_maps: {attention_maps}\n")
+            else:
+                x = block(x, **kwargs_save_am)
+        else:
+            x = block(x, **kwargs_not_save_am)
     # head
     x = self.head(x, e)
 
     # Context Parallel
-    x = get_sp_group().all_gather(x, dim=1)
+    group = get_sp_group()
+    x = group.all_gather(x, dim=1)
 
     # unpatchify
     x = self.unpatchify(x, grid_sizes)
-    return [u.float() for u in x]
 
+
+    if save_attention and 'cross' in attention_maps:
+        returned_attention_maps = {}
+        
+        # Use differentiable all_gather that preserves gradients
+        # The key is to use torch.distributed.nn.functional.all_gather which is differentiable
+        from torch.distributed.nn.functional import all_gather as differentiable_all_gather
+        
+        world_size = get_sequence_parallel_world_size()
+        if world_size == 1:
+            returned_attention_maps['cross'] = attention_maps['cross']
+        else:
+            # This version preserves gradients!
+            gathered_tensors = differentiable_all_gather(
+                attention_maps['cross'], 
+                group=get_sp_group().device_group
+            )
+            # Concatenate along dim=2 (sequence dimension)
+            returned_attention_maps['cross'] = torch.cat(gathered_tensors, dim=2)
+    if save_attention:
+        return [u.float() for u in x], returned_attention_maps, counter_attention_maps
+
+    else:
+        return [u.float() for u in x]
 
 def usp_attn_forward(self,
                      x,
