@@ -124,22 +124,12 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              Recent advances in generative video models have enabled the creation of high-quality videos
-              based on natural language prompts. However, these models frequently lack fine-grained 
-              temporal control, meaning they do not allow users to specify when particular visual elements
-              should appear within a generated sequence.
-              In this work, we introduce <strong>TempoControl</strong>, a method that allows for temporal alignment
-              of visual concepts during inference, without requiring retraining or additional supervision.
+              Recent advances in generative video models have enabled the creation of high-quality videos based on natural language prompts. However, these models frequently lack fine-grained temporal control, meaning they do not allow users to specify when particular visual elements should appear within a generated sequence.
+              In this work, we introduce <strong>TempoControl</strong>, a method that allows for temporal alignment of visual concepts during inference, without requiring retraining or additional supervision.
             </p>
             <p>
-              TempoControl utilizes cross-attention maps, which are an inherent component of text-to-video
-              diffusion models, to guide the timing of concepts through a novel optimization approach.
-              Our method steers attention using three complementary principles: aligning its temporal
-              shape with a control signal (via correlation), amplifying it where visibility is needed
-              (via energy), and keeping it spatially focused (via entropy). TempoControl allows precise
-              control over timing while ensuring high video quality and diversity. We demonstrate its
-              effectiveness across various video generation applications, including temporal reordering
-              for single and multiple objects, as well as action and audio-aligned generation.
+              TempoControl utilizes cross-attention maps, a key component of text-to-video diffusion models, to guide the timing of concepts through a novel optimization approach. Our method steers attention using three complementary principles: aligning its temporal pattern with a control signal (correlation), adjusting its strength where visibility is required (magnitude), and preserving semantic consistency (entropy). TempoControl provides precise temporal control while maintaining high video quality and diversity.
+              We demonstrate its effectiveness across various applications, including temporal reordering of single and multiple objects, action timing, and audio-aligned video generation.
             </p>
           </div>
         </div>
@@ -773,10 +763,10 @@
       
       <div class="center-image-attention">
   <img src="images/attention.jpg" alt="Attention Visualization">
-  <p class="video-caption">Video generated for the prompt ``A cat and a dog.'' Before (left) and after optimization (right). Top: Spatial attention maps for the tokens <i>cat</i>> and <i>dog</i> at denoising step $t{=}3$, shown for frames $j{=}2,10,19$. Attention is overlaid on generated frames. Bottom: temporal attention $a_{i,j}^t$ (blue) vs. target mask $m_{i,j}$ (orange), with Pearson correlation loss shown.</p>
+    <p class="video-caption">Motivation for our approach. <strong>Top:</strong> We show a video generated for the prompt "The video begins with a serene view centered on the cat, with no sign of the dog. In the second half, the dog unexpectedly appears, altering the dynamic of the scene." The top row displays the attention maps for the tokens <em>cat</em> and <em>dog</em>, extracted from the denoising step $t{=}3$, for frames $j{=}2,6,10,14,19$. On the left, the video is generated without our optimization. Despite the prompt specifying that the dog should appear in the second half, it appears early. This behavior is common, as Wan 2.1 often fails to depict objects or movements according to temporal cues in the prompt. On the right, after applying our conditioning method, the dog correctly appears in the second half of the video. <strong>Bottom:</strong> Temporal attention $a_{i,j}^t$ (blue) versus target mask $m_{i,j}$ (orange), with the corresponding Pearson correlation loss shown.</p>
       </div>
       <p>
-        Our loss consists of the following components, for temporal (i) $\mathcal{L}_{\text{corr}}^t$ (ii) $\mathcal{L}_{\text{energy}}^t$, for spatial (iii) $\mathcal{L}_{\text{entropy}}^t$ (iv) $\mathcal{L}_{\text{spatial}}^t$:
+        The loss $\mathcal{L}^t$ consists of a single main component: a temporal correlation term that aligns the attention pattern with the target mask. While this term is most significant for aligning with the temporal condition, we also include two terms that further improve the results: (ii) a magnitude term that amplifies or suppresses token-level activation, and (iii) an attention entropy regularization term that preserves spatial consistency:
       </p>
 
       <div style="margin: 2rem 0;">
@@ -790,7 +780,7 @@
           \end{equation}$$
         </div>
         
-        <p><strong>(ii) Attention energy term $\mathcal{L}_{\text{energy}}^t$:</strong></p>
+        <p><strong>(ii) Attention magnitude term $\mathcal{L}_{\text{energy}}^t$:</strong></p>
         <p style="margin: 1rem 0; color: #555;">
           Directly promotes stronger attention in frames where the temporal signal is high, and suppresses it elsewhere, mitigating cases where correlation scores are high but attention values are too low to render the object visible.
         </p>
@@ -808,7 +798,7 @@
           \end{equation}$$
         </div>
 
-        <p><strong>(iii) Entropy regularization $\mathcal{L}_{\text{entropy}}^t$:</strong></p>
+        <p><strong>(iii) Attention entropy regularization $\mathcal{L}_{\text{entropy}}^t$:</strong></p>
         <p style="margin: 1rem 0; color: #555;">
           Maintains spatial focus, ensuring that when attention is activated, it remains coherent and not diffusely spread across the frame.
         </p>
@@ -818,24 +808,15 @@
           \end{equation}$$
         </div>
 
-        <p><strong>(iv) Spatial consistency penalty $\mathcal{L}_{\text{spatial}}^t$:</strong></p>
-        <p style="margin: 1rem 0; color: #555;">
-          Maintains spatial consistency by penalizing deviations between the initial and optimized spatial attention maps for the target word.
-        </p>
-        <div style="text-align: center; margin: 1.5rem 0;">
-          $$\begin{equation}
-          \mathcal{L}_{\text{spatial}}^t = \left\| \sum_{j=1}^{T'} \left( \hat{A}^{t}_{j,i} - \bar{A}^{t}_{j,i} \right) \right\|_2^2
-          \end{equation}$$
-        </div>
 
         <p><strong>Total Loss:</strong></p>
         <div style="text-align: center; margin: 1.5rem 0;">
           $$\begin{equation}
-          \mathcal{L}^t = \mathcal{L}_{\text{corr}}^t + \lambda_1 \mathcal{L}_{\text{energy}}^t + \lambda_2 \mathcal{L}_{\text{entropy}}^t + \lambda_3 \mathcal{L}_{\text{spatial}}^t
+          \mathcal{L}^t = \mathcal{L}_{\text{corr}}^t + \lambda_1 \mathcal{L}_{\text{energy}}^t + \lambda_2 \mathcal{L}_{\text{entropy}}^t
           \end{equation}$$
         </div>
         <p style="font-size: 0.95rem; color: #666;">
-          where $\lambda_1, \lambda_2, \lambda_3$ are hyperparameters that balance the contributions of each loss term.
+          where $\lambda_1$ and $\lambda_2$ are hyperparameters that balance the contributions of each loss term.
         </p>
       </div>
 
