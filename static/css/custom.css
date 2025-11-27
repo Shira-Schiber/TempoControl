@@ -424,6 +424,10 @@ body {
   border: 1px solid #dee2e6;
   max-width: 80px;
   margin: 0 auto;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* VS indicator between videos */
