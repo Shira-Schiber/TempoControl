@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import cv2
 import numpy as np
-from ultralytics import YOLO
+from ultralytics import YOLOv10
 from tqdm import tqdm
 import json
 
@@ -111,7 +111,7 @@ def parse_frame_config(config_str):
         # Remove any extra whitespace and split
         config_values = config_str.strip().split()
         # Convert to integers
-        return [int(val) for val in config_values]
+        return [int(val) for val in config_values][1:] 
     except Exception as e:
         print(f"Error parsing frame config: {str(e)}")
         return None
@@ -119,7 +119,7 @@ def parse_frame_config(config_str):
 def main(args):
     # Find the CSV file in the videos_path directory
     csv = pd.read_csv(args.csv_file)
-    model = YOLO("yolov10n.pt")
+    model = YOLOv10.from_pretrained('jameslahm/yolov10x')
     results_list = []
 
     for idx, row in tqdm(csv.iterrows(), total=len(csv)):

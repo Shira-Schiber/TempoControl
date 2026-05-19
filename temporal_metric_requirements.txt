@@ -2,5 +2,5 @@ argparse
 pandas
 opencv-python
 numpy
-ultralytics==8.1.34  
+git+https://github.com/THU-MIG/yolov10.git@453c6e38
 tqdm
